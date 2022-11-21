@@ -6,7 +6,7 @@ jobs:
   build:
     docker:
       #- image: python:3.7.3-stretch
-      - image: python:3.11-rc-alpine
+      - image: circleci/python:3.6.4
 
     steps:
       - checkout
@@ -31,7 +31,7 @@ jobs:
 
   upload_docker :
     docker:
-      - image: docker:17.05.0-ce-git
+      - image: circleci/python:3.7
     steps:
       - checkout
       - setup_remote_docker:
@@ -39,19 +39,132 @@ jobs:
       - run :
           name: build docker image 
           command: | 
-            docker build --tag=astoimage .
+            docker build --tag=capstone-project .
             docker image ls 
-            docker run -p 5000:5000 astoimage
+            docker run -p 5000:5000 capstone-project
 
 
-      #- run : 
-       #   name: upload docker image 
-        #  command : | 
-         #   echo "Docker ID and Image: NASA" 
-          #  docker login -u=kusumass P=Spckgv@0410
-           # docker tag $DOCKER_IMAGE_NAME $DOCKERHUBUSER_NAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
-            #docker push $DOCKERHUBUSER_NAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
+      - run : 
+          name: upload docker image 
+          command : | 
+            echo "Docker ID and Image: ${DOCKER_IMAGE_NAME}" 
+            docker login -u=${DOCKERHUBUSER_NAME} P=${DOCKERPASSWORD}
+            docker tag ${DOCKER_IMAGE_NAME} ${DOCKERHUBUSER_NAME}/${DOCKER_IMAGE_NAME}:${CIRCLE_WORKFLOW_ID}
+            docker push ${DOCKERHUBUSER_NAME}/${DOCKER_IMAGE_NAME}:${CIRCLE_WORKFLOW_ID}
           
+
+  create_infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name : Ensure network infra exsists
+          command : |
+            aws cloudformation \
+            create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
+            --template-body file://cloudformation/network.yml \
+            --parameters file://cloudformation/networkparameter.json \
+            --region=us-east-1
+
+      - run: 
+          name: Ensure cluster infra exists
+          command : |
+            aws cloudformation \
+            create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
+            --template-body file://cloudformation/cluster.yml \
+            --parameters-overrides file://cloudformation/clusterparameter.json \
+            --region=us-east-1\
+            --capabilities CAPABILITY_NAMED_IAM
+          no_output_timeout: 15m
+
+      - run: 
+          name: Ensure cluster infra exists
+          command : |
+            aws cloudformation \
+            create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
+            --template-body file://cloudformation/node.yml \
+            --parameters-overrides file://cloudformation/nodeparameter.json \
+            --region=us-east-1 \
+            --capabilities CAPABILITY_NAMED_IAM
+
+      - run:
+            name: Install aws-iam-authenticator
+            command: |
+              curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-east-1.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+              sudo chmod +x ./aws-iam-authenticator
+              sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+
+      - run:
+            name: Install kubectl
+            command: |
+              curl -o kubectl https://amazon-eks.s3-us-east-1.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
+              sudo chmod +x ./kubectl
+              sudo mv ./kubectl /usr/local/bin/kubectl
+
+      - run:
+            name: Connect to cluster
+            command: |
+              aws eks list-clusters>~/cluster_name.txt
+              EXPORT CLUSTER_NAME = $(cat ~/cluster_name)
+              aws eks --region us-east-1 update-kubeconfig --name $CLUSTER_NAME
+
+      - run:
+          name: deploy on kuberbetes
+          command: |
+            kubectl apply -f deployment.yaml
+            kubectl get pod
+
+  LOADbalacer:
+    docker:
+    - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Store old WorkflowID
+          command: |
+            aws cloudformation \
+            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text > ~/oldworkflowid.txt
+            export WorkflowID=$(cat ~/oldworkflowid.txt)
+            echo WorkflowID: "$WorkflowID"
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - oldworkflowid.txt
+      - run:
+          name: loadbalancer installation
+          command: |
+            aws cloudformation \
+            create-stack --stack-name loadbalacer-${CIRCLECI_WORKFLOW_ID}\
+            --template-file file://cloudformation/loadbalancer.yml \
+            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+            --region=us-east-1
+
+  cleanup:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Clean up old environment
+          command: |
+            # Fetch the Old workflow ID
+            export OldWorkflowID=$(cat ~/oldworkflowid.txt)
+            CurrentWorkflowID=${CIRCLE_WORKFLOW_ID:0:7}
+            if [[ "$CurrentWorkflowID" != "${OldWorkflowID}" ]]
+            then
+                echo "$OldWorkflowID!=$CurrentWorkflowID => will delete old version"
+                aws cloudformation delete-stack --stack-name "networkinfra_${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "clusternode-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "workernode-${OldWorkflowID}"
+            else
+                echo "$OldWorkflowID==$CurrentWorkflowID => nothing needs to be done..."
+            fi
+
 
 workflows:
   defaults:

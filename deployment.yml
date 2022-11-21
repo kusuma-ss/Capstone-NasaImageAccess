@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capstone-project
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: capstone-project
+  template:
+    metadata:
+      labels:
+        app: capstone-project
+    spec:
+      containers:
+        - name: capstone-project
+          image: kusumass/capstone-project
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: capstone-project
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+  selector:
+    app: capstone-project
