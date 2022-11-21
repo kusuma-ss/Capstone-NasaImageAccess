@@ -2,7 +2,7 @@ version : 2.1
 orbs:
   slack: circleci/slack@4.10.1
 
-Jobs:
+jobs:
   build:
     docker:
       #- image: python:3.7.3-stretch
@@ -50,7 +50,7 @@ Jobs:
           
 
 workflows:
-  default:
+  defaults:
     jobs:
       - build
       - upload_docker
