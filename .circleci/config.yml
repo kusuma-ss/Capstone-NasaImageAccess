@@ -62,31 +62,37 @@ jobs:
       - run:
           name : Ensure network infra exsists
           command : |
+            EXPORT PARAMETERS_FILE="cloudformation/networkparameter.json"
+            EXPORT PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
             aws cloudformation deploy \
             --template-file cloudformation/network.yml  \
             --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --parameters-overrides cloudformation/networkparameter.json \
+            --parameters-override ${PARAMS[@]} \
             --region=us-east-1
               
 
       - run: 
           name: Ensure cluster infra exists
           command : |
+            EXPORT PARAMETERS_FILE="cloudformation/clusterparameter.json"
+            EXPORT PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
             aws cloudformation deploy\
             --template-file cloudformation/cluster.yml \
             --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"" \
-            --parameters-overrides cloudformation/clusterparameter.json \
-            --region=us-east-1\
+            --parameters-overrides ${PARAMS[@]} \
+            --region=us-east-1 \
             --capabilities CAPABILITY_NAMED_IAM
           no_output_timeout: 15m
 
       - run: 
           name: Ensure cluster infra exists
           command : |
+            EXPORT PARAMETERS_FILE="cloudformation/clusterparameter.json"
+            EXPORT PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
             aws cloudformation deploy\
             --template-file cloudformation/node.yml \
             --stack-name " workernode-${CIRCLE_WORKFLOW_ID:0:7}"\
-            --parameters-overrides cloudformation/nodeparameter.json \
+            --parameters-overrides ${PARAMS[@]}\
             --region=us-east-1 \
             --capabilities CAPABILITY_NAMED_IAM
 
