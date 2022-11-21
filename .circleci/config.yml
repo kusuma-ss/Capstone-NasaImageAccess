@@ -118,7 +118,7 @@ jobs:
 
       
 
-  LOADbalacer:
+  LOADbalancer:
     docker:
     - image: amazon/aws-cli
     steps:
@@ -181,7 +181,7 @@ workflows:
       - build
       - upload_docker
       - create_infrastructure
-      - LOADbalacer:
+      - LOADbalancer:
           requires:
             - create_infrastructure
       - cleanup:
