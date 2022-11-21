@@ -65,7 +65,7 @@ jobs:
             aws cloudformation deploy \
             --template-file cloudformation/network.yml  \
             --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --parameters-overrides file://cloudformation/networkparameter.json \
+            --parameters-overrides cloudformation/networkparameter.json \
             --region=us-east-1
               
 
@@ -75,7 +75,7 @@ jobs:
             aws cloudformation deploy\
             --template-file cloudformation/cluster.yml \
             --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"" \
-            --parameters-overrides file://cloudformation/clusterparameter.json \
+            --parameters-overrides cloudformation/clusterparameter.json \
             --region=us-east-1\
             --capabilities CAPABILITY_NAMED_IAM
           no_output_timeout: 15m
@@ -86,7 +86,7 @@ jobs:
             aws cloudformation deploy\
             --template-file cloudformation/node.yml \
             --stack-name " workernode-${CIRCLE_WORKFLOW_ID:0:7}"\
-            --parameters-overrides file://cloudformation/nodeparameter.json \
+            --parameters-overrides cloudformation/nodeparameter.json \
             --region=us-east-1 \
             --capabilities CAPABILITY_NAMED_IAM
 
