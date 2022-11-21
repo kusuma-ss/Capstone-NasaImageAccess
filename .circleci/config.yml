@@ -1,0 +1,51 @@
+version : 2.1
+orbs:
+  slack: circleci/slack@4.10.1
+
+Jobs:
+  build:
+    docker:
+      #- image: python:3.7.3-stretch
+      - image: python:3.11-rc-alpine
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+
+            - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+
+  upload_docker:
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run :
+          name: build docker image 
+          command: | 
+            docker build --tag=NASA .
+            docker image ls 
+            docker run -p 5000:5000 NASA
+
+
+      #- run : 
+       #   name: upload docker image 
+        #  command : | 
+         #   echo "Docker ID and Image: NASA" 
+          #  docker login -u=kusumass P=Spckgv@0410
+           # docker tag $DOCKER_IMAGE_NAME $DOCKERHUBUSER_NAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
+            #docker push $DOCKERHUBUSER_NAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
+          
+
+workflow:
+  default:
+    jobs:
+      - upload_docker
