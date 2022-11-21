@@ -65,7 +65,7 @@ jobs:
             aws cloudformation deploy \
             --template-file cloudformation/network.yml  \
             --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --parameters file://cloudformation/networkparameter.json \
+            --parameters-overrides file://cloudformation/networkparameter.json \
             --region=us-east-1
               
 
@@ -179,8 +179,8 @@ jobs:
 workflows:
   defaults:
     jobs:
-      - build
-      - upload_docker
+      #- build
+      #- upload_docker
       - create_infrastructure
       - LOADbalancer:
           requires:
