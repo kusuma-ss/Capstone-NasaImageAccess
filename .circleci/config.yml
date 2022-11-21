@@ -62,18 +62,19 @@ jobs:
       - run:
           name : Ensure network infra exsists
           command : |
-            aws cloudformation \
-            create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
-            --template-body file://cloudformation/network.yml \
+            aws cloudformation deploy \
+            --template-file cloudformation/network.yml  \
+            --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
             --parameters file://cloudformation/networkparameter.json \
             --region=us-east-1
+              
 
       - run: 
           name: Ensure cluster infra exists
           command : |
-            aws cloudformation \
-            create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
-            --template-body file://cloudformation/cluster.yml \
+            aws cloudformation deploy\
+            --template-file cloudformation/cluster.yml \
+            --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"" \
             --parameters-overrides file://cloudformation/clusterparameter.json \
             --region=us-east-1\
             --capabilities CAPABILITY_NAMED_IAM
@@ -82,9 +83,9 @@ jobs:
       - run: 
           name: Ensure cluster infra exists
           command : |
-            aws cloudformation \
-            create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
-            --template-body file://cloudformation/node.yml \
+            aws cloudformation deploy\
+            --template-file cloudformation/node.yml \
+            --stack-name " workernode-${CIRCLE_WORKFLOW_ID:0:7}"\
             --parameters-overrides file://cloudformation/nodeparameter.json \
             --region=us-east-1 \
             --capabilities CAPABILITY_NAMED_IAM
