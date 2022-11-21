@@ -10,11 +10,6 @@ Jobs:
 
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-
-            - v1-dependencies-
 
       - run:
           name: install dependencies
@@ -22,7 +17,16 @@ Jobs:
             python3 -m venv venv
             . venv/bin/activate
 
-  upload_docker:
+            make install
+
+      - run : 
+          name : running lint operation
+          command: | 
+            . venv/bin/activate
+
+            make lint 
+
+  upload_docker :
     docker:
       - image: docker:17.05.0-ce-git
     steps:
@@ -48,4 +52,5 @@ Jobs:
 workflows:
   default:
     jobs:
+      - build
       - upload_docker
