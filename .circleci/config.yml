@@ -62,8 +62,8 @@ jobs:
       - run:
           name : Ensure network infra exsists
           command : |
-            EXPORT PARAMETERS_FILE="cloudformation/networkparameter.json"
-            EXPORT PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
+            export PARAMETERS_FILE="cloudformation/networkparameter.json"
+            export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
             aws cloudformation deploy \
             --template-file cloudformation/network.yml  \
             --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
@@ -74,8 +74,8 @@ jobs:
       - run: 
           name: Ensure cluster infra exists
           command : |
-            EXPORT PARAMETERS_FILE="cloudformation/clusterparameter.json"
-            EXPORT PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
+            export PARAMETERS_FILE="cloudformation/clusterparameter.json"
+            export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
             aws cloudformation deploy\
             --template-file cloudformation/cluster.yml \
             --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"" \
@@ -87,8 +87,8 @@ jobs:
       - run: 
           name: Ensure cluster infra exists
           command : |
-            EXPORT PARAMETERS_FILE="cloudformation/clusterparameter.json"
-            EXPORT PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
+            export PARAMETERS_FILE="cloudformation/clusterparameter.json"
+            export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
             aws cloudformation deploy\
             --template-file cloudformation/node.yml \
             --stack-name " workernode-${CIRCLE_WORKFLOW_ID:0:7}"\
