@@ -178,7 +178,7 @@ jobs:
             --region=us-east-1
 
       - run :
-          name: deploy a loadbalancer service 
+          name: deploy a loadbalancer Service
           command: | 
             kubectl apply -f service.yml
             kubectl get svc
