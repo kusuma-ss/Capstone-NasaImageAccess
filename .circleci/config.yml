@@ -67,6 +67,9 @@ jobs:
               --template-body file://cloudformation/network.yml \
               --parameters file://cloudformation/networkparameter.json \
               --region=us-east-1
+            echo "Waiting for 2 seconds..."
+            sleep 600
+            echo "Task Completed"
 
       #- run: 
        #   sleep 600
@@ -91,6 +94,9 @@ jobs:
               --parameters file://cloudformation/clusterParameter.json \
               --region=us-east-1\
               --capabilities CAPABILITY_NAMED_IAM
+            echo "Waiting for 2 seconds..."
+            sleep 600
+            echo "Task Completed"
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
           #aws cloudformation deploy\
@@ -111,6 +117,9 @@ jobs:
               --parameters file://cloudformation/nodeparameter.json \
               --region=us-east-1 \
               --capabilities CAPABILITY_NAMED_IAM
+            echo "Waiting for 2 seconds..."
+            sleep 600
+            echo "Task Completed"
 
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
@@ -121,12 +130,12 @@ jobs:
           #--region=us-east-1 \
           #--capabilities CAPABILITY_NAMED_IAM
 
-      - run:
-            name: Install aws-iam-authenticator
-            command: |
-              curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-east-1.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
-              sudo chmod +x ./aws-iam-authenticator
-              sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+      #- run:
+            #name: Install aws-iam-authenticator
+            #command: |
+              #curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-east-1.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+              #sudo chmod +x ./aws-iam-authenticator
+              #sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
 
       - run:
             name: Install kubectl
