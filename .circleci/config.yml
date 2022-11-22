@@ -59,14 +59,15 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      #- run:
-       #   name : Ensure network infra exsists
-        #  command : |
-         #   aws cloudformation \
-          #    create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
-           #   --template-body file://cloudformation/network.yml \
-            #  --parameters file://cloudformation/networkparameter.json \
-             # --region=us-east-1
+      - run:
+          name : Ensure network infra exsists
+          command : |
+            aws cloudformation \
+              create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
+              --template-body file://cloudformation/network.yml \
+              --parameters file://cloudformation/networkparameter.json \
+              --region=us-east-1
+            sleep 600
 
       #- run: 
        #   sleep 600
@@ -90,11 +91,7 @@ jobs:
               --parameters file://cloudformation/clusterParameter.json \
               --region=us-east-1\
               --capabilities CAPABILITY_NAMED_IAM
-          no_output_timeout: 15m
-
-      #- run:
-       #   sleep 1000
-        #  echo "Canceling workflow as too much time has elapsed"
+            sleep 1000
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
           #aws cloudformation deploy\
@@ -114,7 +111,7 @@ jobs:
               --parameters file://cloudformation/nodeparameter.json \
               --region=us-east-1 \
               --capabilities CAPABILITY_NAMED_IAM
-      - run: sleep 600;
+            sleep 600
 
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
