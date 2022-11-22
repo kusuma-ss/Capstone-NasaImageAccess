@@ -89,7 +89,6 @@ jobs:
 
       - run: 
           name: Ensure cluster infra exists
-          no_output_timeout: 10m
           command : |
             aws cloudformation \
               create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
@@ -102,6 +101,7 @@ jobs:
           command: |
             aws cloudformation wait stack-create-complete \
             --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"
+          no_output_timeout: 15m
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
           #aws cloudformation deploy\
