@@ -62,13 +62,19 @@ jobs:
       - run:
           name : Ensure network infra exsists
           command : |
-            export PARAMETERS_FILE="cloudformation/networkparameter.json"
-            export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
-            aws cloudformation deploy \
-            --template-file cloudformation/network.yml  \
-            --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --parameters-override ${PARAMS[@]} \
-            --region=us-east-1
+            aws cloudformation \
+              create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
+              --template-body file://cloudformation/network.yml \
+              --parameters file://cloudformation/networkparameter.json \
+              --region=us-east-1
+
+            #export PARAMETERS_FILE="cloudformation/networkparameter.json"
+            #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
+            #aws cloudformation deploy \
+            #--template-file cloudformation/network.yml  \
+            #--stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
+            #--parameters-override ${PARAMS[@]} \
+            #--region=us-east-1
               
 
       - run: 
