@@ -193,10 +193,10 @@ jobs:
       - run:
           name: loadbalancer installation
           command: |
-            aws cloudformation deploy\
-            --template-file cloudformation/loadbalancer.yml \
-            --stack-name loadbalacer-${CIRCLECI_WORKFLOW_ID}\
-            --region=us-east-1
+            aws cloudformation \
+              create-stack --stack-name loadbalacer-${CIRCLECI_WORKFLOW_ID}\\
+              --template-body file://cloudformation/loadbalancer.yml\
+              --region=us-east-1 \
 
       - run :
           name: deploy a loadbalancer Service
