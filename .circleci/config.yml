@@ -114,7 +114,6 @@ jobs:
 
       - run: 
           name: Ensure worker infra exists
-          no_output_timeout: 10m
           command : |
             aws cloudformation \
               create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
