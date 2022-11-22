@@ -59,20 +59,20 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run:
-          name : Ensure network infra exsists
-          command : |
-            aws cloudformation \
-              create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
-              --template-body file://cloudformation/network.yml \
-              --parameters file://cloudformation/networkparameter.json \
-              --region=us-east-1
+      #- run:
+       #   name : Ensure network infra exsists
+        #  command : |
+         #   aws cloudformation \
+          #    create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
+           #   --template-body file://cloudformation/network.yml \
+            #  --parameters file://cloudformation/networkparameter.json \
+             # --region=us-east-1
 
-      - run : 
-          name: wait for task to complete
-          command: |
-            aws cloudformation wait stack-create-complete \
-            --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}"
+      #- run : 
+      #    name: wait for task to complete
+       #   command: |
+       #     aws cloudformation wait stack-create-complete \
+        #    --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}"
 
       #- run: 
        #   sleep 600
@@ -87,21 +87,19 @@ jobs:
           #--region=us-east-1
             
 
-      - run: 
-          name: Ensure cluster infra exists
-          command : |
-            aws cloudformation \
-              create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
-              --template-body file://cloudformation/clusters.yml \
-              --parameters file://cloudformation/clusterParameter.json \
-              --region=us-east-1\
-              --capabilities CAPABILITY_NAMED_IAM
-      - run : 
-          name: wait for task to complete
-          command: |
-            aws cloudformation wait stack-create-complete \
-            --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"
-          no_output_timeout: 20m
+     # - run: 
+      #    aws cloudformation \
+       #       create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
+        #      --template-body file://cloudformation/clusters.yml \
+         #     --parameters file://cloudformation/clusterParameter.json \
+          #    --region=us-east-1\
+           #   --capabilities CAPABILITY_NAMED_IAM
+     # - run : 
+      #    name: wait for task to complete
+       #   command: |
+        #    aws cloudformation wait stack-create-complete \
+         #   --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"
+          #no_output_timeout: 20m
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
           #aws cloudformation deploy\
@@ -112,21 +110,21 @@ jobs:
           #--capabilities CAPABILITY_NAMED_IAM
           
 
-      - run: 
-          name: Ensure worker infra exists
-          command : |
-            aws cloudformation \
-              create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
-              --template-body file://cloudformation/node.yml \
-              --parameters file://cloudformation/nodeparameter.json \
-              --region=us-east-1 \
-              --capabilities CAPABILITY_NAMED_IAM
-      - run : 
-          name: wait for task to complete
-          command: |
-            aws cloudformation wait stack-create-complete \
-            --stack-name "workernode-${CIRCLE_WORKFLOW_ID:0:7}"
-          no_output_timeout: 20m
+   #   - run: 
+    #      name: Ensure worker infra exists
+     #     command : |
+      #      aws cloudformation \
+       #       create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
+        #      --template-body file://cloudformation/node.yml \
+         #     --parameters file://cloudformation/nodeparameter.json \
+          #    --region=us-east-1 \
+           #   --capabilities CAPABILITY_NAMED_IAM
+    #  - run : 
+     #     name: wait for task to complete
+      #    command: |
+       #     aws cloudformation wait stack-create-complete \
+        #    --stack-name "workernode-${CIRCLE_WORKFLOW_ID:0:7}"
+         # no_output_timeout: 20m
 
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
@@ -140,21 +138,21 @@ jobs:
       #- run:
             #name: Install aws-iam-authenticator
             #command: |
-              #curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-east-1.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+              #curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
               #sudo chmod +x ./aws-iam-authenticator
               #sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
 
       - run:
             name: Install kubectl
             command: |
-              curl -o kubectl https://amazon-eks.s3-us-east-1.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
+              curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.8/2019-08-14/bin/linux/amd64/kubectl
               sudo chmod +x ./kubectl
               sudo mv ./kubectl /usr/local/bin/kubectl
 
       - run:
             name: Connect to cluster
             command: |
-              aws eks list-clusters>~/cluster_name.txt
+              aws eks list-clusters > ~/cluster_name.txt
               EXPORT CLUSTER_NAME = $(cat ~/cluster_name)
               aws eks --region us-east-1 update-kubeconfig --name $CLUSTER_NAME
 
