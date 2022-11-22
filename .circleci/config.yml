@@ -195,7 +195,7 @@ jobs:
           command: |
             aws cloudformation \
               create-stack --stack-name loadbalacer-${CIRCLECI_WORKFLOW_ID}\
-              --template-body file://cloudformation/loadbalancer.yml\
+              --template-body file://cloudformation/loadbalance.yml\
               --region=us-east-1 \
 
       - run :
