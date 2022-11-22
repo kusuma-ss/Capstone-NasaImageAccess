@@ -97,9 +97,11 @@ jobs:
               --parameters file://cloudformation/clusterParameter.json \
               --region=us-east-1\
               --capabilities CAPABILITY_NAMED_IAM
-            echo "Waiting for 2 seconds..."
-            sleep 600
-            echo "Task Completed"
+      - run : 
+          name: wait for task to complete
+          command: |
+            aws cloudformation wait stack-create-complete \
+            --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
           #aws cloudformation deploy\
@@ -120,9 +122,11 @@ jobs:
               --parameters file://cloudformation/nodeparameter.json \
               --region=us-east-1 \
               --capabilities CAPABILITY_NAMED_IAM
-            echo "Waiting for 2 seconds..."
-            sleep 600
-            echo "Task Completed"
+      - run : 
+          name: wait for task to complete
+          command: |
+            aws cloudformation wait stack-create-complete \
+            --stack-name "workernode-${CIRCLE_WORKFLOW_ID:0:7}"
 
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
