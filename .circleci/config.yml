@@ -83,7 +83,7 @@ jobs:
             aws cloudformation \
               create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
               --template-body file://cloudformation/cluster.yml \
-              --parameters-overrides file://cloudformation/clusterparameter.json \
+              --parameters file://cloudformation/clusterparameter.json \
               --region=us-east-1\
               --capabilities CAPABILITY_NAMED_IAM
 
@@ -103,7 +103,7 @@ jobs:
             aws cloudformation \
               create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
               --template-body file://cloudformation/node.yml \
-              --parameters-overrides file://cloudformation/nodeparameter.json \
+              --parameters file://cloudformation/nodeparameter.json \
               --region=us-east-1 \
               --capabilities CAPABILITY_NAMED_IAM
 
