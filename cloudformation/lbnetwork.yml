@@ -6,9 +6,10 @@ Description: >
     and default routes for them in the private subnets.
 
 Parameters:
-  WorkflowID:
-    Description: Unique identifier.
+  ProjectName:
+    Description: projectname for our project
     Type: String
+    Default: Udacitycapstone
     
 Resources:
     LoadBalancerSecurityGroup:
@@ -28,11 +29,11 @@ Resources:
                     CidrIp: 0.0.0.0/0
             Tags: 
                 - Key: Name
-                  Value: !Sub ${WorkflowID}-LoadBalancerSecurityGrp
+                  Value: !Sub ${ProjectName}-LoadBalancerSecurityGrp
 
 Outputs:
     LoadBalancerSecurityGroup:
         Description: Load balancer security group
         Value: !Ref LoadBalancerSecurityGroup
         Export:
-            Name: !Sub ${WorkflowID}-LoadBalancerSecurityGrp
+            Name: !Sub ${ProjectName}-LoadBalancerSecurityGrp

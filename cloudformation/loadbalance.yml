@@ -3,10 +3,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Amazon EKS loadbalaner '
 
 Parameters:
-  WorkflowID:
-    Description: Unique identifier.
-    Type: String
-
   ProjectName:
     Description: projectname for our project
     Type: String
@@ -32,12 +28,12 @@ Resources:
   EKSLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name : !Sub "loadbalancer-${WorkflowID}"
+      Name : !Sub "loadbalancer-${ProjectName}"
       Subnets: 
       - Fn::ImportValue: !Sub ${ProjectName}-PUB-SN-1
       - Fn::ImportValue: !Sub ${ProjectName}-PUB-SN-2
       SecurityGroups: 
-      - Fn::ImportValue: !Sub ${WorkflowID}-LoadBalancerSecurityGrp
+      - Fn::ImportValue: !Sub ${ProjectName}-LoadBalancerSecurityGrp
       Tags: 
         - Key : Name
           Value : EKS Load Balancer 
@@ -71,8 +67,8 @@ Resources:
 #   Value: !Join ["",["http://",!GetAtt EKSLB.DNSName ]]
 Outputs:
   WorkflowID:
-    Value: !Sub ${WorkflowID}
+    Value: !Sub ${ProjectName}
     Description: URL for website 
     Export:
-      Name: WorkflowID
+      Name: ProjectName
     

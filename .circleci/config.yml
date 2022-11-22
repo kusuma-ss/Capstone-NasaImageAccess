@@ -196,8 +196,7 @@ jobs:
             aws cloudformation deploy\
             --template-file cloudformation/loadbalancer.yml \
             --stack-name loadbalacer-${CIRCLECI_WORKFLOW_ID}\
-            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-            --tags project=udapeople
+            --region=us-east-1
 
       - run :
           name: deploy a loadbalancer Service
