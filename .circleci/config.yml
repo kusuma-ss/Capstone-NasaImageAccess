@@ -72,7 +72,7 @@ jobs:
           name: wait for task to complete
           command: |
             aws cloudformation wait stack-create-complete \
-            --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7"
+            --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}"
 
       #- run: 
        #   sleep 600
