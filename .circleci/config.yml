@@ -64,72 +64,56 @@ jobs:
           command: |
             sudo pip3 install awscli
             sudo apt-get install gettext-base
-        #- run:
-       #   name : Ensure network infra exsists
-        #  command : |
-         #   aws cloudformation \
-          #    create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
-           #   --template-body file://cloudformation/network.yml \
-            #  --parameters file://cloudformation/networkparameter.json \
-             # --region=us-east-1
+      - run:
+          name : Ensure network infra exsists
+          command : |
+            aws cloudformation \
+              create-stack --stack-name networkinfra-${CIRCLE_WORKFLOW_ID:0:7}\
+              --template-body file://cloudformation/network.yml \
+              --parameters file://cloudformation/networkparameter.json \
+              --region=us-east-1
 
-      #- run : 
-      #    name: wait for task to complete
-       #   command: |
-       #     aws cloudformation wait stack-create-complete \
-        #    --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}"
+      - run : 
+          name: wait for task to complete
+          command: |
+            aws cloudformation wait stack-create-complete \
+            --stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}"
 
-      #- run: 
-       #   sleep 600
-        #  echo "Canceling workflow as too much time has elapsed"
-          #no_output_timeout: 10m
-          #export PARAMETERS_FILE="cloudformation/networkparameter.json"
-          #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
-          #aws cloudformation deploy \
-          #--template-file cloudformation/network.yml  \
-          #--stack-name "networkinfra-${CIRCLE_WORKFLOW_ID:0:7}" \
-          #--parameters-override ${PARAMS[@]} \
-          #--region=us-east-1
+
+      - run: 
+          name : Ensure cluster infra exsists
+          command : |
+            aws cloudformation \
+                create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
+                --template-body file://cloudformation/clusters.yml \
+                --parameters file://cloudformation/clusterParameter.json \
+                --region=us-east-1\
+                --capabilities CAPABILITY_NAMED_IAM
+
+      - run : 
+            name: wait for task to complete
+            command: |
+              aws cloudformation wait stack-create-complete \
+              --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"
+            no_output_timeout: 20m
             
-
-     # - run: 
-      #    aws cloudformation \
-       #       create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
-        #      --template-body file://cloudformation/clusters.yml \
-         #     --parameters file://cloudformation/clusterParameter.json \
-          #    --region=us-east-1\
-           #   --capabilities CAPABILITY_NAMED_IAM
-     # - run : 
-      #    name: wait for task to complete
-       #   command: |
-        #    aws cloudformation wait stack-create-complete \
-         #   --stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"
-          #no_output_timeout: 20m
-          #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
-          #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
-          #aws cloudformation deploy\
-          #--template-file cloudformation/cluster.yml \
-          #--stack-name "clusternode-${CIRCLE_WORKFLOW_ID:0:7}"" \
-          #--parameters-overrides ${PARAMS[@]} \
-          #--region=us-east-1 \
-          #--capabilities CAPABILITY_NAMED_IAM
           
 
-   #   - run: 
-    #      name: Ensure worker infra exists
-     #     command : |
-      #      aws cloudformation \
-       #       create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
-        #      --template-body file://cloudformation/node.yml \
-         #     --parameters file://cloudformation/nodeparameter.json \
-          #    --region=us-east-1 \
-           #   --capabilities CAPABILITY_NAMED_IAM
-    #  - run : 
-     #     name: wait for task to complete
-      #    command: |
-       #     aws cloudformation wait stack-create-complete \
-        #    --stack-name "workernode-${CIRCLE_WORKFLOW_ID:0:7}"
-         # no_output_timeout: 20m
+      - run: 
+          name: Ensure worker infra exists
+          command : |
+            aws cloudformation \
+              create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
+              --template-body file://cloudformation/node.yml \
+              --parameters file://cloudformation/nodeparameter.json \
+              --region=us-east-1 \
+              --capabilities CAPABILITY_NAMED_IAM
+      - run : 
+          name: wait for task to complete
+          command: |
+            aws cloudformation wait stack-create-complete \
+            --stack-name "workernode-${CIRCLE_WORKFLOW_ID:0:7}"
+          no_output_timeout: 20m
 
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
@@ -164,11 +148,43 @@ jobs:
       - run:
           name: deploy on kuberbetes
           command: |
+            kubectl apply -f deployment.yml
             kubectl get pod
-  ##kubectl apply -f deployment.yml
-      
 
-  LOADbalancer:
+      - run:
+          name: loadbalancer installation
+          command: |
+            aws cloudformation \
+              create-stack --stack-name loadbalancernetwork-${CIRCLE_WORKFLOW_ID:0:7}\
+              --template-body file://cloudformation/lbnetwork.yml \
+               --region=us-east-1
+
+      - run : 
+          name: wait for task to complete
+          command: |
+            aws cloudformation wait stack-create-complete \
+            --stack-name "loadbalancernetwork-${CIRCLE_WORKFLOW_ID:0:7}"
+
+      - run:
+          name: loadbalancer installation
+          command: |
+            aws cloudformation \
+              create-stack --stack-name loadbalacer-${CIRCLE_WORKFLOW_ID:0:7}\
+              --template-body file://cloudformation/loadbalance.yml\
+              --region=us-east-1 
+      - run : 
+          name: wait for task to complete
+          command: |
+            aws cloudformation wait stack-create-complete \
+            --stack-name "loadbalacer-${CIRCLE_WORKFLOW_ID:0:7}"
+
+      - run :
+          name: deploy a loadbalancer Service
+          command: | 
+            kubectl apply -f service.yml
+            kubectl get svc      
+
+  workflowid:
     docker:
       - image: python:3.11-rc-alpine
     steps:
@@ -190,19 +206,7 @@ jobs:
           root: ~/
           paths:
             - oldworkflowid.txt
-      - run:
-          name: loadbalancer installation
-          command: |
-            aws cloudformation \
-              create-stack --stack-name loadbalacer-${CIRCLECI_WORKFLOW_ID}\
-              --template-body file://cloudformation/loadbalance.yml\
-              --region=us-east-1 \
-
-      - run :
-          name: deploy a loadbalancer Service
-          command: | 
-            kubectl apply -f service.yml
-            kubectl get svc
+      
 
   cleanup:
     docker:
@@ -235,9 +239,4 @@ workflows:
       #- build
       #- upload_docker
       - create_infrastructure
-      - LOADbalancer:
-          requires:
-            - create_infrastructure
-      - cleanup:
-          requires:
-            - LOADbalancer
+     
