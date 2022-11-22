@@ -164,16 +164,20 @@ jobs:
       - run:
           name: deploy on kuberbetes
           command: |
-            kubectl apply -f deployment.yml
             kubectl get pod
-
+  ##kubectl apply -f deployment.yml
       
 
   LOADbalancer:
     docker:
-    - image: amazon/aws-cli
+      - image: python:3.11-rc-alpine
     steps:
       - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip nodejs npm curl
+            pip install awscli
       - run:
           name: Store old WorkflowID
           command: |
