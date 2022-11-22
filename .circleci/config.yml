@@ -67,6 +67,7 @@ jobs:
               --template-body file://cloudformation/network.yml \
               --parameters file://cloudformation/networkparameter.json \
               --region=us-east-1
+            no_output_timeout: 10m
 
       #- run: 
        #   sleep 600
@@ -84,13 +85,13 @@ jobs:
       - run: 
           name: Ensure cluster infra exists
           command : |
-            no_output_timeout: 10m
             aws cloudformation \
               create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
               --template-body file://cloudformation/clusters.yml \
               --parameters file://cloudformation/clusterParameter.json \
               --region=us-east-1\
               --capabilities CAPABILITY_NAMED_IAM
+            no_output_timeout: 10m
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
           #aws cloudformation deploy\
@@ -102,15 +103,15 @@ jobs:
           
 
       - run: 
-          name: Ensure cluster infra exists
+          name: Ensure worker infra exists
           command : |
-            no_output_timeout: 10m
             aws cloudformation \
               create-stack --stack-name workernode-${CIRCLE_WORKFLOW_ID:0:7}\
               --template-body file://cloudformation/node.yml \
               --parameters file://cloudformation/nodeparameter.json \
               --region=us-east-1 \
               --capabilities CAPABILITY_NAMED_IAM
+            no_output_timeout: 10m
 
           #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
           #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
