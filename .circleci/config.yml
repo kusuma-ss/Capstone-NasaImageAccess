@@ -177,7 +177,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update --no-cache tar gzip nodejs npm curl
-            pip install awscli
+            sudo pip3 install awscli
       - run:
           name: Store old WorkflowID
           command: |
