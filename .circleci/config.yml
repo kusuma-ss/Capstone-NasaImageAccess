@@ -82,8 +82,8 @@ jobs:
           command : |
             aws cloudformation \
               create-stack --stack-name clusternode-${CIRCLE_WORKFLOW_ID:0:7}\
-              --template-body file://cloudformation/cluster.yml \
-              --parameters file://cloudformation/clusterparameter.json \
+              --template-body file://cloudformation/clusters.yml \
+              --parameters file://cloudformation/clusterParameter.json \
               --region=us-east-1\
               --capabilities CAPABILITY_NAMED_IAM
 
