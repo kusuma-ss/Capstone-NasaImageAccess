@@ -27,7 +27,7 @@ Resources:
   EKSLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name : !Sub "loadbalancer-${ProjectName}"
+      Name : !Sub "lb-${ProjectName}"
       Subnets: 
       - Fn::ImportValue: !Sub ${ProjectName}-PUB-SN-1
       - Fn::ImportValue: !Sub ${ProjectName}-PUB-SN-2
