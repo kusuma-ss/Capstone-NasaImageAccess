@@ -168,6 +168,7 @@ jobs:
       - run:
           name: Install aws-iam-authenticator
           command: |
+          
             
             curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
 
@@ -191,14 +192,25 @@ jobs:
           name: deploy on kuberbetes
           command: |
             kubectl apply -f deployment.yaml
-            kubectl get service
+            for (( i=60; i>0; i--)); do
+              sleep 1 &
+              printf "  $i \r"
+              wait
+            done
             kubectl get deployments
+            kubectl get service
 
       - run :
           name: deploy service
           command: | 
             kubectl apply -f service.yml
-            kubectl get pod     
+            for (( i=60; i>0; i--)); do
+              sleep 1 &
+              printf "  $i \r"
+              wait
+            done
+            kubectl get pod    
+            kubectl get service 
 
   workflowid:
     docker:
