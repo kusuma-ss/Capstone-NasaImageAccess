@@ -43,7 +43,7 @@ jobs:
           command: | 
             docker build --tag=capstone-project .
             docker image ls 
-            docker run -p 3000:3000 capstone-project
+        #docker run -p 3000:3000 capstone-project
 
 
       - run : 
