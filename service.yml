@@ -4,7 +4,6 @@ kind: Service
 metadata:
   name: capstone-project
 spec:
-  type: LoadBalancer
   selector:
     app: capstone-project
   ports:
