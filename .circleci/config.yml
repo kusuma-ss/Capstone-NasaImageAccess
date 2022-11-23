@@ -191,7 +191,6 @@ jobs:
           name: deploy on kuberbetes
           command: |
             kubectl apply -f deployment.yaml
-            kubectl get pod
             kubectl get service
             kubectl get deployments
 
@@ -253,14 +252,14 @@ jobs:
 workflows:
   defaults:
     jobs:
-      - build
-      - upload_docker:
-          requires:
-            - build
+      #- build
+      #- upload_docker:
+        #  requires:
+         #   - build
 
       #- create_infrastructure
-      - deploy_infra:
-          requires:
+      - deploy_infra
+          #requires:
             #- create_infrastructure
-            - upload_docker
+          #  - upload_docker
      
