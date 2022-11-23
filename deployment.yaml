@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capstone-project
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: capstone-project
+  template:
+    metadata:
+      labels:
+        app: capstone-project
+    spec:
+      containers:
+        - name: capstone-project
+          image: kusumass/capstone-project
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+
+
