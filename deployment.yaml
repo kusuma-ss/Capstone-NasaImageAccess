@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: capstone-project
-          image: kusumass/capstone-project
+          image: kusumass/capstone-project:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
