@@ -195,7 +195,7 @@ jobs:
             kubectl get deployments
 
       - run :
-          name: deploy a loadbalancer Service
+          name: deploy service
           command: | 
             kubectl apply -f service.yml
             kubectl get pod     
