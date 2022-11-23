@@ -9,7 +9,6 @@ Parameters:
     Default: Udacitycapstone
 
 Resources:
-  
   EKSTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:

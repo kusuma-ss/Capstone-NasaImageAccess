@@ -16,7 +16,9 @@ Resources:
         Type: AWS::EC2::SecurityGroup
         Properties:
             GroupDescription: Allow http to our load balancer
-            VpcId: !Ref VPC
+            VpcId: 
+                Fn::ImportValue: 
+                    Fn::Sub: "${ProjectName}-VPCID"
             SecurityGroupIngress:
                 -   IpProtocol: TCP
                     FromPort: 80
