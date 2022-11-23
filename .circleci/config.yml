@@ -51,9 +51,9 @@ jobs:
           command : | 
             export DOCKER_IMAGE_NAME=capstone-project
             echo "Docker ID and Image: ${DOCKER_IMAGE_NAME}" 
-            docker login -u=${DOCKERHUBUSER_NAME} P=${DOCKERPASSWORD}
-            docker tag ${DOCKER_IMAGE_NAME} ${DOCKERHUBUSER_NAME}/${DOCKER_IMAGE_NAME}:${CIRCLE_WORKFLOW_ID}
-            docker push ${DOCKERHUBUSER_NAME}/${DOCKER_IMAGE_NAME}:${CIRCLE_WORKFLOW_ID}
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:${CIRCLE_WORKFLOW_ID}
+            docker push ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:${CIRCLE_WORKFLOW_ID}
           
 
   create_infrastructure:
