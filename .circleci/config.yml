@@ -194,7 +194,7 @@ jobs:
       - run :
           name: deploy a loadbalancer Service
           command: | 
-            kubectl apply -f service.yml
+            kubectl proxy
             kubectl get pod     
 
   workflowid:
@@ -254,9 +254,9 @@ workflows:
           requires:
             - build
 
-      - create_infrastructure
+      #- create_infrastructure
       - deploy_infra:
           requires:
-            - create_infrastructure
+            #- create_infrastructure
             - upload_docker
      
