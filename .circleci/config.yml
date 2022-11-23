@@ -188,7 +188,6 @@ jobs:
       - run:
           name: deploy on kuberbetes
           command: |
-            kubectl delete pods --all
             kubectl apply -f deployment.yaml
             kubectl get pod
 
@@ -254,7 +253,10 @@ workflows:
       - upload_docker:
           requires:
             - build
+
+      - create_infrastructure
       - deploy_infra:
           requires:
+            - create_infrastructure
             - upload_docker
      

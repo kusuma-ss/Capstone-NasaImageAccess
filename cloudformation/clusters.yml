@@ -12,6 +12,14 @@ Parameters:
     Type: String
 
 Resources:    
+  ClusterInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub ${ProjectName}-cluster-profile
+      Path: "/"
+      Roles:
+        - !Ref ClusterRole
+
   ClusterRole:
     Description: Allows EKS to manage clusters on your behalf.
     Type: AWS::IAM::Role
@@ -24,9 +32,10 @@ Resources:
               Service:
                 - eks.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns: 
+      ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
         - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
       Path: "/"
 
   ClusterControlPlaneSecurityGroup:
