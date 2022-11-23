@@ -5,7 +5,7 @@
 	},
     {
         "ParameterKey": "ProjectName",
-        "ParameterValue": "Udacitycapstone"
+        "ParameterValue": "Udacitycapstoneproject"
     },
     {
         "ParameterKey" : "VpcCIDR",

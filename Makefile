@@ -5,8 +5,8 @@ setup:
 
 install:
 	# This should be run from inside a virtualenv
-	#pip install --upgrade pip &&\
-	#		pip install -r requirements.txt
+	pip install --upgrade pip &&\
+			pip install -r requirements.txt
 
 	#curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 	sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 && \
@@ -23,6 +23,6 @@ lint:
 	hadolint --ignore DL3013 Dockerfile 
 	# This is a linter for Python source code linter: https://www.pylint.org/
 	# This should be run from inside a virtualenv
-	#pylint --disable=R,C,W1203,W1202 application.py
+	pylint --disable=R,C,W1203,W1202 app.py
 
 all: install lint test

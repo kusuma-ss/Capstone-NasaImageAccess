@@ -41,7 +41,7 @@ jobs:
           command: | 
             docker build --tag=capstone-project .
             docker image ls 
-            docker run -p 5000:5000 capstone-project
+            docker run -p 3000:3000 capstone-project
 
 
       - run : 
@@ -182,7 +182,7 @@ jobs:
           name: deploy a loadbalancer Service
           command: | 
             kubectl apply -f service.yml
-            kubectl get svc      
+            kubectl get pod     
 
   workflowid:
     docker:
@@ -236,7 +236,11 @@ jobs:
 workflows:
   defaults:
     jobs:
-      #- build
-      #- upload_docker
-      - create_infrastructure
+      - build
+      - upload_docker:
+          requires:
+            - build
+      - create_infrastructure:
+          requires:
+            - upload_docker
      

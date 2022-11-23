@@ -9,7 +9,7 @@ Parameters:
   ProjectName:
     Description: projectname for our project
     Type: String
-    Default: Udacitycapstone
+    Default: Udacitycapstoneproject
     
 Resources:
     LoadBalancerSecurityGroup:
