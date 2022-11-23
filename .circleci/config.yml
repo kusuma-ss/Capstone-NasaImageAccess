@@ -168,7 +168,9 @@ jobs:
       - run:
           name: Install aws-iam-authenticator
           command: |
-            curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+            #curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+            curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
+
             sudo chmod +x ./aws-iam-authenticator
             sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
 
@@ -194,7 +196,7 @@ jobs:
       - run :
           name: deploy a loadbalancer Service
           command: | 
-            kubectl proxy
+            kubectl apply -f service.yml
             kubectl get pod     
 
   workflowid:

@@ -18,7 +18,7 @@ spec:
           image: kusumass/capstone-project:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
           resources:
             limits:
               memory: 512Mi
@@ -31,5 +31,4 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 50%
-
 
