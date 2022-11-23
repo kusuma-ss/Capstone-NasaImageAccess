@@ -145,7 +145,7 @@ jobs:
             command: |
               aws eks list-clusters > ~/cluster_name.txt
               export CLUSTER_NAME=$(cat ~/cluster_name.txt)
-              aws eks --region us-east-1 update-kubeconfig --name Udacitycapstone-Cluster
+              aws eks --region us-east-1 update-kubeconfig --name Udacitycapstoneproject-Cluster
 
       - run:
           name: deploy on kuberbetes
