@@ -33,7 +33,7 @@ jobs:
           name: install dependencies
           command: |
             uname
-            apt udpate
+            apt update
             apt install -y gettext
             envsubst -V
             python3 -m venv venv
