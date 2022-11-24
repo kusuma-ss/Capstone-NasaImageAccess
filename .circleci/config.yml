@@ -229,7 +229,7 @@ jobs:
 
             kubectl get service 
             http_code=$(curl -LI ${HOST} -f -o /dev/null -w '%{http_code}\n' -s)
-            echo "${HOST}"
+            echo "cURL response code ${HOST}"
 
           #  if [ ${http_code}  -eq 200 ]; then
           #    echo "${HOST} is reachable"
