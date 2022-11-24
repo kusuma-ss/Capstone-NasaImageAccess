@@ -4,4 +4,4 @@ COPY app /app
 
 RUN cp -R /app/* /var/www/html
 
-EXPOSE 80
+EXPOSE 3000
