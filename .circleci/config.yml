@@ -206,7 +206,7 @@ jobs:
           name: Wait for pods
           command: |
             ATTEMPTS=0
-            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/capstone"
+            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/capstone-project-deployment"
             until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
               $ROLLOUT_STATUS_CMD
               ATTEMPTS=$((attempts + 1))
