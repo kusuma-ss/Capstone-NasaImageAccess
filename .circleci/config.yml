@@ -33,6 +33,9 @@ jobs:
           name: install dependencies
           command: |
             uname
+            apt udpate
+            apt install -y gettext
+            envsubst -V
             python3 -m venv venv
             . venv/bin/activate
 
