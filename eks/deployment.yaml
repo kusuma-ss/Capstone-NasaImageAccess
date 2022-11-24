@@ -18,7 +18,7 @@ spec:
           image: kusumass/capstone-project-webapp:${imageTag}
           imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 80
           resources:
             limits:
               memory: 512Mi
