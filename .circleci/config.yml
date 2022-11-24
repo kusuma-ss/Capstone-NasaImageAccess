@@ -195,6 +195,7 @@ jobs:
             done
             kubectl get deployments
             kubectl get service
+            kubectl describe pods
           # printf "  $i \r"
       - run :
           name: deploy service
