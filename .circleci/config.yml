@@ -61,7 +61,7 @@ jobs:
             export NASA_API_KEY=$API_KEY
             echo ${NASA_API_KEY}
             envsubst '${NASA_API_KEY}' < config_IN.js >> config.js
-            cat /app/config.js
+            cat config.js
 
       - run : 
           name : running lint operation
