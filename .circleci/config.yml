@@ -185,7 +185,7 @@ jobs:
       - run:
           name: deploy on kubernetes
           command: |
-            export imageTag =${CIRCLE_WORKFLOW_ID:0:4}
+            export imageTag=${CIRCLE_WORKFLOW_ID:0:4}
             envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f 
             kubectl get deployments
             for (( i=60; i>0; i--)); do
@@ -212,10 +212,10 @@ workflows:
   defaults:
     jobs:
       - build_and_upload_docker
-      - create_infrastructure
+      #- create_infrastructure
       - deploy_infra:
           requires:
-            - create_infrastructure
+            #- create_infrastructure
             - build_and_upload_docker
      
 #echo "export NASA_API_KEY=$API_KEY"  >> ~/.bashrc
