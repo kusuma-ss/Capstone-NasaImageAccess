@@ -54,6 +54,16 @@ jobs:
             cat Dockerfile
 
       - run : 
+          name: obtaining NASA API key 
+          command: | 
+            cd app
+            echo $API_KEY
+            export NASA_API_KEY=$API_KEY
+            echo ${NASA_API_KEY}
+            envsubst '${NASA_API_KEY}' < config_IN.js >> config.js
+            cat /app/config.js
+
+      - run : 
           name : running lint operation
           command: | 
             . venv/bin/activate
