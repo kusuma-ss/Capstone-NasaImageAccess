@@ -49,9 +49,7 @@ jobs:
             echo ${NASA_API_KEY}
             touch oldDockerfile 
             cat Dockerfile >> oldDockerfile 
-            #cat oldDockerfile   
-            rm Dockerfile
-            #ls 
+            rm Dockerfile 
             envsubst '${NASA_API_KEY}' < oldDockerfile  >> Dockerfile
             cat Dockerfile
 
@@ -210,3 +208,7 @@ workflows:
       #      - create_infrastructure
       #      - upload_docker
      
+#echo "export NASA_API_KEY=$API_KEY"  >> ~/.bashrc
+            #source ~/.bashrc
+            #cat ~/.bashrc
+             #cat oldDockerfile   
