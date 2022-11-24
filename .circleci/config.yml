@@ -2,8 +2,23 @@ version : 2.1
 orbs:
   slack: circleci/slack@4.10.1
 
+commands:
+  destroy-environment: 
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      ID : 
+        type: string 
+    steps:
+      - run: 
+          name: Destroy  environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name "networkinfra-<< parameters.ID >>"
+            aws cloudformation delete-stack --stack-name "clusternode-<< parameters.ID >>"
+            aws cloudformation delete-stack --stack-name "workernode-<< parameters.ID >>"
+
 jobs:
-  build:
+  build_and_upload_docker:
     docker:
       #- image: python:3.7.3-stretch
       - image: circleci/python:3.6.4
@@ -13,47 +28,52 @@ jobs:
 
       - setup_remote_docker:
           version: 20.10.6
-
+     
       - run:
           name: install dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
 
+            cd app
             make install
             sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 && \
             sudo chmod +x /bin/hadolint
 
       - run : 
+          name: obtaining NASA API key 
+          command: | 
+            cd app
+            echo "export NASA_API_KEY=${API_KEY}"  >> ~/.bashrc
+            echo ${NASA_API_KEY}
+      - run :
+          name: create appilcation Dockerfile
+          command: |
+            cd app
+            envsubst '${NASA_API_KEY}' < Dockerfile>> Dockerfile
+            cat Dockerfile
+
+      - run : 
           name : running lint operation
           command: | 
             . venv/bin/activate
-
+            cd app
             make lint 
 
-  upload_docker :
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 20.10.6
       - run :
           name: build docker image 
           command: | 
-            docker build --tag=capstone-project .
+            cd app
+            docker build --tag=capstone-project-webapp:v1 .
             docker image ls 
-        #docker run -p 3000:3000 capstone-project
-
-
       - run : 
           name: upload docker image 
           command : | 
-            export DOCKER_IMAGE_NAME=capstone-project
+            export DOCKER_IMAGE_NAME=capstone-project-webapp:v1
             echo "Docker ID and Image: ${DOCKER_IMAGE_NAME}" 
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
-            docker push ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
+            docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}
+            docker push ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}
           
 
   create_infrastructure:
@@ -111,6 +131,7 @@ jobs:
               --parameters file://cloudformation/nodeparameter.json \
               --region=us-east-1 \
               --capabilities CAPABILITY_NAMED_IAM
+
       - run : 
           name: wait for task to complete
           command: |
@@ -118,41 +139,8 @@ jobs:
             --stack-name "workernode-${CIRCLE_WORKFLOW_ID:0:7}"
           no_output_timeout: 20m
 
-          #export PARAMETERS_FILE="cloudformation/clusterparameter.json"
-          #export PARAMS=($(jq -r '.Parameters[] | [.ParameterKey, .ParameterValue] | "\(.[0])=\(.[1])"' ${PARAMETERS_FILE}))
-          #aws cloudformation deploy\
-          #--template-file cloudformation/node.yml \
-          #--stack-name " workernode-${CIRCLE_WORKFLOW_ID:0:7}"\
-          #--parameters-overrides ${PARAMS[@]}\
-          #--region=us-east-1 \
-          #--capabilities CAPABILITY_NAMED_IAM
-
-      - run:
-          name: loadbalancer installation
-          command: |
-            aws cloudformation \
-              create-stack --stack-name loadbalancernetwork-${CIRCLE_WORKFLOW_ID:0:7}\
-              --template-body file://cloudformation/lbnetwork.yml \
-               --region=us-east-1
-
-      - run : 
-          name: wait for task to complete
-          command: |
-            aws cloudformation wait stack-create-complete \
-            --stack-name "loadbalancernetwork-${CIRCLE_WORKFLOW_ID:0:7}"
-
-      - run:
-          name: loadbalancer installation
-          command: |
-            aws cloudformation \
-              create-stack --stack-name loadbalacer-${CIRCLE_WORKFLOW_ID:0:7}\
-              --template-body file://cloudformation/loadbalance.yml\
-              --region=us-east-1 
-      - run : 
-          name: wait for task to complete
-          command: |
-            aws cloudformation wait stack-create-complete \
-            --stack-name "loadbalacer-${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:  
+          ID: ${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy_infra:
     docker:
@@ -167,9 +155,7 @@ jobs:
 
       - run:
           name: Install aws-iam-authenticator
-          command: |
-          
-            
+          command: |  
             curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
 
             sudo chmod +x ./aws-iam-authenticator
@@ -189,89 +175,38 @@ jobs:
               export CLUSTER_NAME=$(cat ~/cluster_name.txt)
               aws eks --region us-east-1 update-kubeconfig --name Udacitycapstoneproject-Cluster
       - run:
-          name: deploy on kuberbetes
+          name: deploy on kubernetes
           command: |
-            kubectl apply -f deployment.yaml
+            kubectl apply -f eks/deployment.yaml
+            kubectl get deployments
             for (( i=60; i>0; i--)); do
               sleep 1 &
-              printf "  $i \r"
               wait
             done
             kubectl get deployments
             kubectl get service
-
+          # printf "  $i \r"
       - run :
           name: deploy service
           command: | 
-            kubectl apply -f service.yml
+            kubectl apply -f eks/service.yml
             for (( i=60; i>0; i--)); do
               sleep 1 &
-              printf "  $i \r"
               wait
             done
             kubectl get pod    
             kubectl get service 
-
-  workflowid:
-    docker:
-      - image: python:3.11-rc-alpine
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update --no-cache tar gzip nodejs npm curl
-            pip3 install awscli
-      - run:
-          name: Store old WorkflowID
-          command: |
-            aws cloudformation \
-            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-            --no-paginate --output text > ~/oldworkflowid.txt
-            export WorkflowID=$(cat ~/oldworkflowid.txt)
-            echo WorkflowID: "$WorkflowID"
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - oldworkflowid.txt
-      
-
-  cleanup:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run: yum install -y tar gzip
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Clean up old environment
-          command: |
-            # Fetch the Old workflow ID
-            export OldWorkflowID=$(cat ~/oldworkflowid.txt)
-            CurrentWorkflowID=${CIRCLE_WORKFLOW_ID:0:7}
-            if [[ "$CurrentWorkflowID" != "${OldWorkflowID}" ]]
-            then
-                echo "$OldWorkflowID!=$CurrentWorkflowID => will delete old version"
-                aws cloudformation delete-stack --stack-name "networkinfra_${OldWorkflowID}"
-                aws cloudformation delete-stack --stack-name "clusternode-${OldWorkflowID}"
-                aws cloudformation delete-stack --stack-name "workernode-${OldWorkflowID}"
-            else
-                echo "$OldWorkflowID==$CurrentWorkflowID => nothing needs to be done..."
-            fi
-
+          # printf "  $i \r"
+         
 
 workflows:
   defaults:
     jobs:
-      #- build
-      #- upload_docker:
-        #  requires:
-         #   - build
-
+      - build_and_upload_docker
+      
       #- create_infrastructure
-      - deploy_infra
-          #requires:
-            #- create_infrastructure
-          #  - upload_docker
+      #- deploy_infra:
+      #    requires:
+      #      - create_infrastructure
+      #      - upload_docker
      
