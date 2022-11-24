@@ -44,7 +44,7 @@ jobs:
       - run : 
           name: obtaining NASA API key 
           command: | 
-            echo export NASA_API_KEY=${API_KEY}  >> ~/.bashrc
+            echo "export NASA_API_KEY=${API_KEY}"  >> ~/.bashrc
             source ~/.bashrc
             echo ${NASA_API_KEY}
       - run :
