@@ -218,7 +218,7 @@ jobs:
           command: | 
             kubectl apply -f eks/service.yml   
 
-            for (( i=20; i>0; i--)); do
+            for (( i=60; i>0; i--)); do
               sleep 1 &
               wait
             done 
