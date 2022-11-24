@@ -32,6 +32,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            uname
             python3 -m venv venv
             . venv/bin/activate
 
