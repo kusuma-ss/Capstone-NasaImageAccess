@@ -1,20 +1,13 @@
-#FROM node:10
-#WORKDIR /app
-#RUN npm install
-#COPY . /app/
-#EXPOSE 3000
-#CMD [ "node", "app.js" ]
+FROM ubuntu/nginx
 
-FROM python:3.7.3-stretch
+RUN echo "export DEMO_KEY=${NASA_API_KEY}" >> ~/.bashrc
 
-WORKDIR /app
+COPY . /app
 
-COPY . app.py /app/
+RUN envsubst ${DEMO_KEY}  < /app/config.js >> /app/config.js
 
-# hadolint ignore=DL3013
-RUN pip install --upgrade pip &&\
-    pip install --trusted-host pypi.python.org -r requirements.txt
+RUN cat /app/config.js
 
-EXPOSE 3000
+RUN cp -R /app/* /var/www/html
 
-CMD ["python", "app.py"]
+EXPOSE 80

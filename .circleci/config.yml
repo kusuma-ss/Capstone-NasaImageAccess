@@ -38,22 +38,17 @@ jobs:
             envsubst -V
             python3 -m venv venv
             . venv/bin/activate
-
-            cd app
-            make install
             sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 && \
             sudo chmod +x /bin/hadolint
 
       - run : 
           name: obtaining NASA API key 
           command: | 
-            cd app
             echo "export NASA_API_KEY=${API_KEY}"  >> ~/.bashrc
             echo ${NASA_API_KEY}
       - run :
           name: create appilcation Dockerfile
           command: |
-            cd app
             envsubst '${NASA_API_KEY}' < Dockerfile>> Dockerfile
             cat Dockerfile
 
@@ -61,15 +56,13 @@ jobs:
           name : running lint operation
           command: | 
             . venv/bin/activate
-            cd app
             make lint 
 
       - run :
           name: build docker image 
           command: | 
-            cd app
             docker build --tag=capstone-project-webapp:v1 .
-            docker image ls 
+            docker image ls
       - run : 
           name: upload docker image 
           command : | 
