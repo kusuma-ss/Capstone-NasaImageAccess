@@ -49,9 +49,6 @@ jobs:
             source ~/.bashrc
             cat ~/.bashrc
             echo ${NASA_API_KEY}
-      - run :
-          name: create appilcation Dockerfile
-          command: |
             touch oldDockerfile 
             cat Dockerfile >> oldDockerfile 
             #cat oldDockerfile   
