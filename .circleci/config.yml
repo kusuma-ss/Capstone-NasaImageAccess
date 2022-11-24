@@ -54,9 +54,9 @@ jobs:
           command: |
             touch oldDockerfile 
             cat Dockerfile >> oldDockerfile 
-            cat oldDockerfile   
+            #cat oldDockerfile   
             rm Dockerfile
-            ls 
+            #ls 
             envsubst '${NASA_API_KEY}' < oldDockerfile  >> Dockerfile
             cat Dockerfile
 
