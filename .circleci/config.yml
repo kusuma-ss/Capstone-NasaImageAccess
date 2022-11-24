@@ -45,9 +45,7 @@ jobs:
           name: obtaining NASA API key 
           command: | 
             echo $API_KEY
-            echo "export NASA_API_KEY=$API_KEY"  >> ~/.bashrc
-            source ~/.bashrc
-            cat ~/.bashrc
+            export NASA_API_KEY=$API_KEY
             echo ${NASA_API_KEY}
             touch oldDockerfile 
             cat Dockerfile >> oldDockerfile 
