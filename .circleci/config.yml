@@ -47,6 +47,7 @@ jobs:
             echo $API_KEY
             echo "export NASA_API_KEY=$API_KEY"  >> ~/.bashrc
             source ~/.bashrc
+            cat ~/.bashrc
             echo ${NASA_API_KEY}
       - run :
           name: create appilcation Dockerfile
@@ -55,6 +56,7 @@ jobs:
             cat Dockerfile >> oldDockerfile 
             cat oldDockerfile   
             rm Dockerfile
+            ls 
             envsubst '${NASA_API_KEY}' < oldDockerfile  >> Dockerfile
             cat Dockerfile
 
