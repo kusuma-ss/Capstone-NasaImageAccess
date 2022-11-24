@@ -198,7 +198,7 @@ jobs:
           # kubectl describe pods
           # printf "  $i \r"
       - run :
-          name: update deployment 
+          name: update deployment with new image
           command: |
             kubectl set image deployments/capstone-project-deployment capstone-project=kusumass/capstone-project-webapp:${CIRCLE_WORKFLOW_ID:0:4}
       
@@ -216,24 +216,28 @@ jobs:
       - run :
           name: deploy service and test
           command: | 
-            kubectl apply -f eks/service.yml
-            for (( i=60; i>0; i--)); do
+            kubectl apply -f eks/service.yml   
+
+            for (( i=20; i>0; i--)); do
               sleep 1 &
               wait
-            done    
+            done 
+
             HOST=$(kubectl get service capstone-project-service | grep 'amazonaws.com' | awk '{print $4}')
             echo "http request sent to..."
             echo "${HOST}"
+
             kubectl get service 
             http_code=$(curl -LI $HOST -f -o /dev/null -w '%{http_code}\n' -s)
+
             if [ ${http_code}  -eq 200 ]; then
               echo "${http_code} is reachable"
               exit 0
             else 
               echo "application not reachable"
               exit 1
+            fi
               
-            
           #  curl $HOST -f 
           # printf "  $i \r"
          
