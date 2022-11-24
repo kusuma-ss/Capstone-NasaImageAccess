@@ -188,8 +188,9 @@ jobs:
             export imageTag=${CIRCLE_WORKFLOW_ID:0:4}
             #envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f eks/deployment.yaml
             kubectl get deployments
-            for (( i=60; i>0; i--)); do
+            for (( i=30; i>0; i--)); do
               sleep 1 &
+              kubectl get deployments
               wait
             done
             kubectl get deployments
