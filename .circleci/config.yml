@@ -228,7 +228,7 @@ jobs:
             echo "${HOST}"
 
             kubectl get service 
-            http_code=$(curl -LI $HOST -f -o /dev/null -w '%{http_code}\n' -s)
+            http_code=$(curl -LI ${HOST} -f -o /dev/null -w '%{http_code}\n' -s)
 
             if [ ${http_code}  -eq 200 ]; then
               echo "${HOST} is reachable"
@@ -246,10 +246,10 @@ workflows:
   defaults:
     jobs:
       - build_and_upload_docker
-      - create_infrastructure
+      #- create_infrastructure
       - deploy_infra:
           requires:
-            - create_infrastructure
+            #- create_infrastructure
             - build_and_upload_docker
      
 #echo "export NASA_API_KEY=$API_KEY"  >> ~/.bashrc
