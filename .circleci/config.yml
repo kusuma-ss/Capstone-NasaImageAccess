@@ -190,7 +190,7 @@ jobs:
             kubectl get deployments
             for (( i=30; i>0; i--)); do
               sleep 1 &
-              kubectl get deployments
+              kubectl get pods
               wait
             done
             kubectl get deployments
