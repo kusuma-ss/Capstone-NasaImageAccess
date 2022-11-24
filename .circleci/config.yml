@@ -72,12 +72,12 @@ jobs:
       - run :
           name: build docker image 
           command: | 
-            docker build --tag=capstone-project-webapp:${CIRCLE_WORKFLOW_ID:0:4} .
+            docker build --tag=capstone-project-webapp:v2 .
             docker image ls
       - run : 
           name: upload docker image 
           command : | 
-            export DOCKER_IMAGE_NAME=capstone-project-webapp:${CIRCLE_WORKFLOW_ID:0:4}
+            export DOCKER_IMAGE_NAME=capstone-project-webapp:v2
             echo "Docker ID and Image: ${DOCKER_IMAGE_NAME}" 
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}
@@ -185,8 +185,7 @@ jobs:
       - run:
           name: deploy on kubernetes
           command: |
-            export imageTag=${CIRCLE_WORKFLOW_ID:0:4}
-            envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f eks/deployment.yaml
+            kubectl apply -f eks/deployment.yaml
             kubectl get deployments
             for (( i=60; i>0; i--)); do
               sleep 1 &
@@ -222,3 +221,6 @@ workflows:
             #source ~/.bashrc
             #cat ~/.bashrc
              #cat oldDockerfile   
+
+##export imageTag=${CIRCLE_WORKFLOW_ID:0:4}
+            #envsubst '${imageTag}' < eks/deployment.yaml | 
