@@ -247,10 +247,10 @@ workflows:
   defaults:
     jobs:
       - build_and_upload_docker
-      #- create_infrastructure
+      - create_infrastructure
       - deploy_infra:
           requires:
-            #- create_infrastructure
+            - create_infrastructure
             - build_and_upload_docker
      
 #echo "export NASA_API_KEY=$API_KEY"  >> ~/.bashrc
