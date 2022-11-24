@@ -214,7 +214,7 @@ jobs:
             done
 
       - run :
-          name: deploy service and test
+          name: deploy service 
           command: | 
             kubectl apply -f eks/service.yml   
 
@@ -227,10 +227,10 @@ jobs:
             echo "http request sent to..."
             echo "${HOST}"
 
-            http_code=$(curl -LI ${HOST} -f -o /dev/null -w '%{http_code}\n' -s)
-            echo "cURL response code ${http_code}"
+          #  http_code=$(curl -LI ${HOST} -f -o /dev/null -w '%{http_code}\n' -s)
+          #  echo "cURL response code ${http_code}"
 
-            kubectl get service
+          #  kubectl get service
           #  if [ ${http_code}  -eq 200 ]; then
           #    echo "${HOST} is reachable"
           #    exit 0
