@@ -50,10 +50,11 @@ jobs:
       - run :
           name: create appilcation Dockerfile
           command: |
-            touch oldDockerfile
-            cat Dockerfile >> oldDcokerfile   
+            touch oldDockerfile 
+            cat Dockerfile >> oldDockerfile 
+            cat oldDockerfile   
             rm Dockerfile
-            envsubst '${NASA_API_KEY}' < oldDockerfile >> Dockerfile
+            envsubst '${NASA_API_KEY}' < oldDockerfile  >> Dockerfile
             cat Dockerfile
 
       - run : 
