@@ -186,27 +186,52 @@ jobs:
           name: deploy on kubernetes
           command: |
             export imageTag=${CIRCLE_WORKFLOW_ID:0:4}
-            #envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f eks/deployment.yaml
-            kubectl get deployments
-            for (( i=30; i>0; i--)); do
-              sleep 1 &
-              kubectl get pods
-              wait
-            done
-            kubectl get deployments
-            kubectl get service
-            kubectl describe pods
+            envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f 
+          #  kubectl get deployments
+          #  for (( i=30; i>0; i--)); do
+          #    sleep 1 &
+          #    kubectl get pods
+          #    wait
+          #  done
+          #  kubectl get deployments
+          #  kubectl get service
+          # kubectl describe pods
           # printf "  $i \r"
       - run :
-          name: deploy service
+          name: update deployment 
+          command: |
+            kubectl set image deployments/capstone-project-deployment capstone-project=kusumass/capstone-project-webapp:${CIRCLE_WORKFLOW_ID:0:4}
+      - run :
+          name: Wait for pods
+          command: |
+            ATTEMPTS=0
+            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/capstone"
+            until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
+              $ROLLOUT_STATUS_CMD
+              ATTEMPTS=$((attempts + 1))
+              sleep 10
+            done
+
+      - run :
+          name: deploy service and test
           command: | 
             kubectl apply -f eks/service.yml
             for (( i=60; i>0; i--)); do
               sleep 1 &
               wait
-            done
-            kubectl get pod    
-            kubectl get service 
+            done    
+            HOST=$(kubectl get service capstone-project-service | grep 'amazonaws.com' | awk '{print $4}')
+          
+            http_code=$(curl -LI $HOST -f -o /dev/null -w '%{http_code}\n' -s)
+            if [ ${http_code}  -eq 200 ]; then
+              echo "${http_code} is reachable"
+              exit 0
+            else 
+              echo " application not reachable"
+              exit 1
+              
+            kubectl get service capstone-project-service
+          #  curl $HOST -f 
           # printf "  $i \r"
          
 
