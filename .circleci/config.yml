@@ -222,16 +222,18 @@ jobs:
               wait
             done    
             HOST=$(kubectl get service capstone-project-service | grep 'amazonaws.com' | awk '{print $4}')
-          
+            echo "http request sent to..."
+            echo "${HOST}"
+            kubectl get service 
             http_code=$(curl -LI $HOST -f -o /dev/null -w '%{http_code}\n' -s)
             if [ ${http_code}  -eq 200 ]; then
               echo "${http_code} is reachable"
               exit 0
             else 
-              echo " application not reachable"
+              echo "application not reachable"
               exit 1
               
-            kubectl get service capstone-project-service
+            
           #  curl $HOST -f 
           # printf "  $i \r"
          
