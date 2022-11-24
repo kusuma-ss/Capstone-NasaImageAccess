@@ -42,7 +42,7 @@ jobs:
             sudo chmod +x /bin/hadolint
 
       - run : 
-          name: obtaining NASA API key 
+          name: obtaining NASA API key and dockerfile
           command: | 
             echo $API_KEY
             export NASA_API_KEY=$API_KEY
@@ -54,7 +54,7 @@ jobs:
             cat Dockerfile
 
       - run : 
-          name: obtaining NASA API key 
+          name: preparing app config
           command: | 
             cd app
             echo $API_KEY
@@ -72,12 +72,12 @@ jobs:
       - run :
           name: build docker image 
           command: | 
-            docker build --tag=capstone-project-webapp:v1 .
+            docker build --tag=capstone-project-webapp:${CIRCLE_WORKFLOW_ID:0:4} .
             docker image ls
       - run : 
           name: upload docker image 
           command : | 
-            export DOCKER_IMAGE_NAME=capstone-project-webapp:v1
+            export DOCKER_IMAGE_NAME=capstone-project-webapp:${CIRCLE_WORKFLOW_ID:0:4}
             echo "Docker ID and Image: ${DOCKER_IMAGE_NAME}" 
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}
@@ -185,7 +185,8 @@ jobs:
       - run:
           name: deploy on kubernetes
           command: |
-            kubectl apply -f eks/deployment.yaml
+            export imageTag =${CIRCLE_WORKFLOW_ID:0:4}
+            envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f 
             kubectl get deployments
             for (( i=60; i>0; i--)); do
               sleep 1 &
@@ -211,12 +212,11 @@ workflows:
   defaults:
     jobs:
       - build_and_upload_docker
-      
-      #- create_infrastructure
-      #- deploy_infra:
-      #    requires:
-      #      - create_infrastructure
-      #      - upload_docker
+      - create_infrastructure
+      - deploy_infra:
+          requires:
+            - create_infrastructure
+            - build_and_upload_docker
      
 #echo "export NASA_API_KEY=$API_KEY"  >> ~/.bashrc
             #source ~/.bashrc
