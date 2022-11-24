@@ -186,7 +186,7 @@ jobs:
           name: deploy on kubernetes
           command: |
             export imageTag=${CIRCLE_WORKFLOW_ID:0:4}
-            envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f 
+            envsubst '${imageTag}' < eks/deployment.yaml | kubectl apply -f deployment.yaml 
           #  kubectl get deployments
           #  for (( i=30; i>0; i--)); do
           #    sleep 1 &
@@ -201,6 +201,7 @@ jobs:
           name: update deployment 
           command: |
             kubectl set image deployments/capstone-project-deployment capstone-project=kusumass/capstone-project-webapp:${CIRCLE_WORKFLOW_ID:0:4}
+      
       - run :
           name: Wait for pods
           command: |
